@@ -1,3 +1,6 @@
+import Player from '@vimeo/player';
+import throttle from 'lodash.throttle';
+
 //Виконуй це завдання у файлах 02-video.html і 02-video.js. Розбий його на декілька підзавдань:
 
 //Ознайомся з документацією бібліотеки Vimeo плеєра.
@@ -9,13 +12,18 @@
 //Під час перезавантаження сторінки скористайся методом setCurrentTime() з метою відновлення відтворення зі збереженої позиції.
 //Додай до проекту бібілотеку lodash.throttle і зроби так, щоб час відтворення оновлювався у сховищі не частіше, ніж раз на секунду.
 
- const throttle = require('lodash.throttle');
- const videoPlayer = document.querySelector('#vimeo-player');
+ const iframe = document.querySelector('iframe');
+ const player = new Player(iframe);
+ const CURRENT_TIME = 'videoplayer-current-time';
 
  const onPlay = function(data) {
-    // data is an object containing properties specific to that event
+    localStorage.setItem(CURRENT_TIME, data.seconds);
 };
 
-player.on('play', onPlay);
+player.on('timeupdate', throttle(onPlay, 1000));
 
- localStorage.setItem("videoplayer-current-time", time);
+const savedTime = localStorage.getItem(CURRENT_TIME);
+if(savedTime){
+    player.setCurrentTime(savedTime);
+  }
+
